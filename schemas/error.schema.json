@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Mix02 Error",
+  "type": "object",
+  "required": ["stage", "error_code", "error_type", "message"],
+  "properties": {
+    "stage": {"type": "string"},
+    "error_code": {"type": "integer"},
+    "error_type": {"type": "string"},
+    "message": {"type": "string"},
+    "trace": {"type": ["string", "null"]},
+    "input": {"type": ["string", "null"]},
+    "output": {"type": ["string", "null"]},
+    "suggestion": {"type": ["string", "null"]}
+  }
+}

@@ -1,0 +1,3 @@
+separate_stems: {segment: 6144, overlap: 0.15, tta: false, gpu: true}
+dereverb_denoise: {algo: wpe+rnnoise, rnnoise_strength: 0.50}
+rvc_convert: {chunk: 4.0, index_rate: 0.10, filter_radius: 2}
