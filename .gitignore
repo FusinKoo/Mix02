@@ -4,5 +4,6 @@ __pycache__/
 work/
 output/
 logs/
-models/
+models/*
+!models/registry.json
 assets/
