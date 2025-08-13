@@ -10,9 +10,9 @@
 | 30 | build_rvc_index | `assets/guide.wav` | `models/rvc/G_8200.index` | 48k/32f/stereo | 可重复运行 |
 | 35 | rvc_convert | `stage-25/Lead_DRY.raw` | `stage-35/Lead_RVC.raw` | 48k/32f/stereo | RVC 转换 |
 | 40-43 | track_chain | `<stem>.raw` | `<stage>/0x_<Name>_stem.wav` | 48k/32f/stereo | 各轨处理 |
-| 50 | mix_bus | 各轨 stem | `output/<song>/final_mix.wav` | 48k/32f/stereo | 总线混音 |
-| 60 | qc_report | 输出目录 | `qc.json` | - | 生成质检报告 |
-| 99 | finalize_run | 输出目录 | 标记完成 | - | 归档运行 |
+| 50 | mix_bus | 各轨 stem | `output/<Song>/99_Final_<Song>_mix_24b48k.wav` | 48k/24b/stereo | 总线混音 |
+| 60 | qc_report | 输出目录 | `QC.md` + `qc.json` | - | 生成质检报告 |
+| 99 | finalize_run | 输出目录 | `RUNLOG.json` | - | 归档运行 |
 
 ## 退出码
 

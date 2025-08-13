@@ -1,7 +1,8 @@
 song ?= MySong
 preset ?= best-quality
-.PHONY: all prep stems lead dry index rvc tracks bus qc finalize
-all: prep stems lead dry index rvc tracks bus qc finalize
+.PHONY: all runpy prep stems lead dry index rvc tracks bus qc finalize
+all: runpy
+runpy:; python scripts/run_pipeline.py $(song) $(preset)
 prep:;  python -m bin.prep_audio --in input/$(song).wav --outdir work/$(song)/stage-05
 stems:; python -m bin.separate_stems --in work/$(song)/stage-05/master_48k32f.wav --outdir work/$(song)/stage-10 --preset $(preset)
 lead:;  python -m bin.extract_lead --in work/$(song)/stage-10/Vocal.raw --outdir work/$(song)/stage-21 --preset $(preset)

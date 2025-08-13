@@ -4,10 +4,10 @@ version = "0.1.0"
 description = "Modular audio pipeline scaffolding (CLI contracts only)"
 authors = [{name = "Mix02"}]
 requires-python = ">=3.10"
-dependencies = []
+dependencies = ["PyYAML>=6.0"]
 
 [project.optional-dependencies]
-dev = ["PyYAML>=6.0", "jsonschema>=4.21"]
+dev = ["jsonschema>=4.21"]
 
 [tool.ruff]
 line-length = 100
