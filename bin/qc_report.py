@@ -1,78 +1,29 @@
-#!/usr/bin/env python3
-import argparse, json, sys, os, hashlib, datetime, pathlib
-try:
-    import yaml
-except ImportError:
-    yaml = None
+from __future__ import annotations
+import argparse, json, os, sys
+from . import _utils as u
 
-def sha256_file(p: str) -> str:
-    h = hashlib.sha256()
-    with open(p, 'rb') as f:
-        for chunk in iter(lambda: f.read(1<<20), b''):
-            h.update(chunk)
-    return h.hexdigest()
-
-def write_json(p: str, obj: dict):
-    os.makedirs(os.path.dirname(p), exist_ok=True)
-    with open(p, 'w', encoding='utf-8') as f:
-        json.dump(obj, f, ensure_ascii=False, indent=2)
-
-def load_preset(name: str):
-    here = pathlib.Path(__file__).resolve().parents[1]
-    if yaml is None:
-        raise FileNotFoundError("PyYAML not installed")
-    preset = here / "presets" / f"{name}.yaml"
-    return yaml.safe_load(open(preset, "r", encoding="utf-8"))
-
-def sidecar(out_path: str, stage: str, preset: str, overrides: dict):
-    now = datetime.datetime.utcnow().isoformat() + 'Z'
-    obj = {
-        'input': None, 'output': os.path.abspath(out_path), 'stage': stage,
-        'sha256': sha256_file(out_path) if os.path.exists(out_path) else None,
-        'samplerate': 48000, 'bit_depth': 32, 'channels': 2,
-        'metrics': {'peak_dbfs': None, 'integrated_lufs': None, 'true_peak_dbtp': None, 'duration_sec': None},
-        'params': {'preset': preset, 'overrides': overrides},
-        'timestamp': now, 'status': 'ok'
-    }
-    return obj
+STAGE = '60-qc_report'
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--in', dest='inp')
-    ap.add_argument('--outdir', default='.')
-    ap.add_argument('--out', dest='out')
-    ap.add_argument('--preset', default='best-quality')
-    ap.add_argument('--override', action='append', default=[])
-    ap.add_argument('--log-json')
-    ap.add_argument('--force', action='store_true')
+    u.add_common_args(ap)
     args = ap.parse_args()
-
-    try:
-        ov = {}
-        for item in args.override:
-            if '=' in item:
-                k, v = item.split('=', 1)
-                ov[k] = v
-        _ = load_preset(args.preset)
-        os.makedirs(args.outdir, exist_ok=True)
-        out_path = args.out or os.path.join(args.outdir, 'qc.json')
-        if not os.path.exists(out_path) or args.force:
-            open(out_path, 'wb').close()
-        sc = sidecar(out_path, stage=os.path.basename(__file__).replace('.py',''), preset=args.preset, overrides=ov)
-        sc['input'] = os.path.abspath(args.inp) if args.inp else None
-        write_json(out_path + '.json', sc)
-        if args.log_json:
-            with open(args.log_json, 'a', encoding='utf-8') as lj:
-                lj.write(json.dumps({'stage': sc['stage'], 'output': sc['output'], 'ts': sc['timestamp']}) + '\n')
+    u.load_preset(args.preset)
+    ov = u.parse_overrides(args.override)
+    out_path = args.out or os.path.join(args.outdir, 'qc.json')
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    plan = {'stage': STAGE, 'plan_output': os.path.abspath(out_path)}
+    if args.dry_run:
+        print(json.dumps(plan, ensure_ascii=False, indent=2))
         return 0
-    except FileNotFoundError as e:
-        err = {'stage': os.path.basename(__file__), 'error_code': 22, 'error_type': 'ModelOrPresetMissing', 'message': str(e)}
-        write_json(os.path.join(args.outdir, 'error.json'), err)
-        return 22
-    except Exception as e:
-        err = {'stage': os.path.basename(__file__), 'error_code': 1, 'error_type': e.__class__.__name__, 'message': str(e)}
-        write_json(os.path.join(args.outdir, 'error.json'), err)
-        return 1
+    open(out_path, 'w', encoding='utf-8').write('qc\n')
+    qc_md = os.path.join(os.path.dirname(out_path), 'QC.md')
+    open(qc_md, 'w', encoding='utf-8').write('# QC Report\n\nTODO\n')
+    sc = u.sidecar(out_path, STAGE, args.preset, ov, args.inp)
+    with open(out_path + '.json', 'w', encoding='utf-8') as f:
+        json.dump(sc, f, ensure_ascii=False, indent=2)
+    u.emit_log(args.log_json, {'stage': STAGE, 'output': out_path})
+    return 0
 
 if __name__ == '__main__':
     sys.exit(main())
