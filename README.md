@@ -2,10 +2,8 @@
 
 License: MIT
 
-本仓库提供**分轨 → 主人声 → 去混响+降噪 → RVC → 每轨处理 → 总线 → 质检**的**独立 CLI 契约**与编排脚手架。当前为**占位实现**：
-- 不包含重型音频算法与外部模型；
-- CLI 可运行、可解析参数、会输出 sidecar JSON 与占位产物；
-- 目录/文件/字段/退出码等契约已固定，后续只需填充真实实现。
+本仓库提供**分轨 → 主人声 → 去混响+降噪 → RVC → 每轨处理 → 总线 → 质检**的**独立 CLI 契约**与编排脚手架。默认实现仍为占位逻辑，但新增了**模型获取器**以自动拉取公共模型。
+您可以在 `models/registry.json` 中查看注册表并通过 `python -m bin.model_fetcher` 将所需模型下载到本地。
 
 ## 快速使用
 ```bash
@@ -15,6 +13,11 @@ chmod +x scripts/run_pipeline.sh
 ./scripts/run_pipeline.sh MySong
 # 或
 python scripts/run_pipeline.py MySong
+```
+
+首次运行前可执行模型获取：
+```bash
+python -m bin.model_fetcher
 ```
 
 ## Dry Run
@@ -32,6 +35,7 @@ python -m bin.env_probe --dry-run
 * `scripts/run_pipeline.sh`：顺序编排执行。
 * `scripts/run_pipeline.py`：跨平台编排器。
 * `Makefile`：常用目标。
+* `env/requirements-full.txt`：全量依赖列表。
 
 ## 契约
 
