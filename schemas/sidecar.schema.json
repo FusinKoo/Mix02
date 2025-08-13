@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Mix02 Sidecar",
+  "type": "object",
+  "required": ["input", "output", "stage", "samplerate", "bit_depth", "channels", "timestamp", "status"],
+  "properties": {
+    "input": {"type": "string"},
+    "output": {"type": "string"},
+    "stage": {"type": "string"},
+    "sha256": {"type": ["string", "null"]},
+    "samplerate": {"type": "integer", "const": 48000},
+    "bit_depth": {"type": "integer", "const": 32},
+    "channels": {"type": "integer", "const": 2},
+    "metrics": {"type": "object"},
+    "params": {"type": "object"},
+    "timestamp": {"type": "string"},
+    "status": {"type": "string", "enum": ["ok", "skipped", "failed"]}
+  }
+}

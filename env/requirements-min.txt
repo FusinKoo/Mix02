@@ -1,0 +1,3 @@
+# 故意保持最小化：标准库 + yaml 解析 + jsonschema 校验（仅开发）
+PyYAML>=6.0
+jsonschema>=4.21

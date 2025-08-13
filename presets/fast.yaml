@@ -1,0 +1,2 @@
+separate_stems: {segment: 4096, overlap: 0.12, tta: false}
+rvc_convert: {chunk: 3.0, crossfade: 0.04}

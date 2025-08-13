@@ -1,0 +1,25 @@
+separate_stems: {model: mdx23c, segment: 10240, overlap: 0.25, tta: true, gpu: true}
+extract_lead:   {method: karaoke2, aggr: 0.6, hp: 120, lp: 12000}
+dereverb_denoise:
+  algo: wpe+arnndn
+  wpe_taps: 10
+  wpe_delay: 3
+  wpe_iters: 3
+  arnndn_strength: 0.20
+rvc_convert:
+  f0_method: rmvpe
+  f0_up_key: 0
+  index_rate: 0.20
+  filter_radius: 3
+  rms_mix_rate: 0.25
+  protect: 0.33
+  resample_sr: 48000
+  chunk: 8.0
+  crossfade: 0.06
+  fade_ms: 8
+track_chain:
+  lead_target_lufs: -17.0
+  other_target_lufs: -19.0
+  tp_ceil_lead: -2.0
+  tp_ceil_others: -2.5
+mix_bus: {target_lufs: -16.0, tp_ceil: -3.0}
