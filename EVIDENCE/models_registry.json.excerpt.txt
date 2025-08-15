@@ -1,0 +1,22 @@
+     1	{
+     2	  "demucs": {
+     3	    "provider": "pip-demucs",
+     4	    "models": ["htdemucs_ft"]
+     5	  },
+     6	  "hubert": {
+     7	    "files": [
+     8	      {"path": "models/hubert/hubert_base.pt", "source": "hf:facebook/hubert-base:resolve/main/hubert.pt", "sha256": null}
+     9	    ]
+    10	  },
+    11	  "f0": {
+    12	    "files": [
+    13	      {"path": "models/f0/rmvpe.pt", "source": "hf:lj1995/VoiceConversionWebUI:resolve/main/assets/rmvpe.pt", "sha256": null},
+    14	      {"path": "models/f0/fcpe.pt",  "source": "hf:FishAudio/FCPE:resolve/main/fcpe.pt", "sha256": null}
+    15	    ]
+    16	  },
+    17	  "dfn": {
+    18	    "files": [
+    19	      {"path": "models/dfn/DeepFilterNet3/model", "source": "hf:Rikorose/DeepFilterNet:resolve/main/DeepFilterNet3/model", "sha256": null}
+    20	    ]
+    21	  }
+    22	}

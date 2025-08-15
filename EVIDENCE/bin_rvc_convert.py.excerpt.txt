@@ -1,0 +1,27 @@
+     1	from __future__ import annotations
+     2	import argparse, json, os, sys
+     3	from . import _utils as u
+     4	
+     5	STAGE = '35-rvc_convert'
+     6	
+     7	def main():
+     8	    ap = argparse.ArgumentParser()
+     9	    u.add_common_args(ap)
+    10	    args = ap.parse_args()
+    11	    u.load_preset(args.preset)
+    12	    ov = u.parse_overrides(args.override)
+    13	    out_path = args.out or os.path.join(args.outdir, 'Lead_RVC.raw')
+    14	    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    15	    plan = {'stage': STAGE, 'plan_output': os.path.abspath(out_path)}
+    16	    if args.dry_run:
+    17	        print(json.dumps(plan, ensure_ascii=False, indent=2))
+    18	        return 0
+    19	    open(out_path, 'w', encoding='utf-8').write('rvc\n')
+    20	    sc = u.sidecar(out_path, STAGE, args.preset, ov, args.inp)
+    21	    with open(out_path + '.json', 'w', encoding='utf-8') as f:
+    22	        json.dump(sc, f, ensure_ascii=False, indent=2)
+    23	    u.emit_log(args.log_json, {'stage': STAGE, 'output': out_path})
+    24	    return 0
+    25	
+    26	if __name__ == '__main__':
+    27	    sys.exit(main())

@@ -1,0 +1,33 @@
+{
+  "repo": { "url": "https://github.com/FusinKoo/Mix02", "default_branch": "main", "head": "cde0fdc" },
+  "status": "blocked",
+  "summary": { "structure": false, "snakemake": false, "cli_real_infer": "none", "naming_limits": false, "model_registry": true, "docs_deps": false },
+  "gaps": [
+    { "id": "WF-001", "category": "workflow", "expected": "workflow/Snakefile", "found": false, "priority": "P0", "fix_hint": "add DAG with rules env_probe..finalize_run" },
+    { "id": "WF-002", "category": "workflow", "expected": "workflow/config/config.yaml", "found": false, "priority": "P0", "fix_hint": "add default config with songs/preset/rvc/resources" },
+    { "id": "WF-003", "category": "workflow", "expected": "workflow/profiles/local/config.yaml", "found": false, "priority": "P0", "fix_hint": "add profile with cores, keep-going, rerun-incomplete" },
+    { "id": "DOC-001", "category": "documentation", "expected": "docs/pipeline_params_fixed.md", "found": false, "priority": "P0", "fix_hint": "sync archived parameter doc to repository" },
+    { "id": "CLI-001", "category": "cli", "expected": "real audio processing in stage CLIs", "found": false, "priority": "P1", "fix_hint": "implement demucs, wpe, dfn, rvc, ffmpeg chain" },
+    { "id": "DEP-001", "category": "dependencies", "expected": "snakemake in env/requirements-full.txt", "found": false, "priority": "P1", "fix_hint": "add snakemake to requirements" },
+    { "id": "DOC-002", "category": "documentation", "expected": "README: Snakemake usage with --profile", "found": false, "priority": "P1", "fix_hint": "document snakemake workflow usage" },
+    { "id": "QC-001", "category": "naming/limits", "expected": "QC.md and RUNLOG.json contain metrics.per_track, components.sha256", "found": false, "priority": "P1", "fix_hint": "populate QC and RUNLOG fields per contract" },
+    { "id": "NAM-001", "category": "naming/limits", "expected": "track loudness thresholds per spec", "found": false, "priority": "P1", "fix_hint": "default lufs for drums/bass/other/lead per spec" },
+    { "id": "ENV-001", "category": "environment", "expected": "docs/envlock.md", "found": false, "priority": "P2", "fix_hint": "add environment lock or version pinning" }
+  ],
+  "evidence": {
+    "tree_file": "EVIDENCE/repo_tree.txt",
+    "snakemake_probe": "EVIDENCE/snakemake_probe.txt",
+    "placeholders": "EVIDENCE/grep_placeholders.txt",
+    "excerpts": [
+      { "path": "bin/mix_bus.py", "file": "EVIDENCE/bin_mix_bus.py.excerpt.txt" },
+      { "path": "bin/track_chain.py", "file": "EVIDENCE/bin_track_chain.py.excerpt.txt" },
+      { "path": "bin/prep_audio.py", "file": "EVIDENCE/bin_prep_audio.py.excerpt.txt" },
+      { "path": "bin/qc_report.py", "file": "EVIDENCE/bin_qc_report.py.excerpt.txt" },
+      { "path": "bin/finalize_run.py", "file": "EVIDENCE/bin_finalize_run.py.excerpt.txt" },
+      { "path": "models/registry.json", "file": "EVIDENCE/models_registry.json.excerpt.txt" },
+      { "path": "README.md", "file": "EVIDENCE/README.md.excerpt.txt" },
+      { "path": "env/requirements-full.txt", "file": "EVIDENCE/env_requirements-full.txt.excerpt.txt" },
+      { "path": "docs/CONTRACTS.md", "file": "EVIDENCE/docs_CONTRACTS.md.excerpt.txt" }
+    ]
+  }
+}

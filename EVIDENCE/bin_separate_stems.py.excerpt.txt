@@ -1,0 +1,30 @@
+     1	from __future__ import annotations
+     2	import argparse, json, os, sys
+     3	from . import _utils as u
+     4	
+     5	STAGE = '10-separate_stems'
+     6	STEMS = ['Vocal.raw', 'Drums.raw', 'Bass.raw', 'Other.raw']
+     7	
+     8	def main():
+     9	    ap = argparse.ArgumentParser()
+    10	    u.add_common_args(ap)
+    11	    args = ap.parse_args()
+    12	    u.load_preset(args.preset)
+    13	    ov = u.parse_overrides(args.override)
+    14	    outputs = [os.path.join(args.outdir, s) for s in STEMS]
+    15	    for p in outputs:
+    16	        os.makedirs(os.path.dirname(p), exist_ok=True)
+    17	    plan = {'stage': STAGE, 'plan_outputs': [os.path.abspath(p) for p in outputs]}
+    18	    if args.dry_run:
+    19	        print(json.dumps(plan, ensure_ascii=False, indent=2))
+    20	        return 0
+    21	    for out_path in outputs:
+    22	        open(out_path, 'w', encoding='utf-8').write('stem\n')
+    23	        sc = u.sidecar(out_path, STAGE, args.preset, ov, args.inp)
+    24	        with open(out_path + '.json', 'w', encoding='utf-8') as f:
+    25	            json.dump(sc, f, ensure_ascii=False, indent=2)
+    26	    u.emit_log(args.log_json, {'stage': STAGE, 'outputs': outputs[0]})
+    27	    return 0
+    28	
+    29	if __name__ == '__main__':
+    30	    sys.exit(main())

@@ -1,0 +1,36 @@
+     1	from __future__ import annotations
+     2	import argparse, json, os, sys
+     3	from . import _utils as u
+     4	
+     5	STAGE = '99-finalize_run'
+     6	
+     7	def main():
+     8	    ap = argparse.ArgumentParser()
+     9	    u.add_common_args(ap)
+    10	    ap.add_argument('--song', required=True)
+    11	    args = ap.parse_args()
+    12	    u.load_preset(args.preset)
+    13	    ov = u.parse_overrides(args.override)
+    14	    out_path = args.out or os.path.join(args.outdir, 'RUNLOG.json')
+    15	    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    16	    plan = {'stage': STAGE, 'plan_output': os.path.abspath(out_path)}
+    17	    if args.dry_run:
+    18	        print(json.dumps(plan, ensure_ascii=False, indent=2))
+    19	        return 0
+    20	    for legacy in [os.path.join(args.outdir, 'final_mix.wav'), os.path.join(args.outdir, f'{args.song}_done.txt')]:
+    21	        if os.path.exists(legacy):
+    22	            print(f'removing legacy artifact: {legacy}')
+    23	            os.remove(legacy)
+    24	            if os.path.exists(legacy + '.json'):
+    25	                os.remove(legacy + '.json')
+    26	    payload = {'stages': [], 'ok': True}
+    27	    with open(out_path, 'w', encoding='utf-8') as f:
+    28	        json.dump(payload, f, ensure_ascii=False, indent=2)
+    29	    sc = u.sidecar(out_path, STAGE, args.preset, ov, args.inp)
+    30	    with open(out_path + '.json', 'w', encoding='utf-8') as f:
+    31	        json.dump(sc, f, ensure_ascii=False, indent=2)
+    32	    u.emit_log(args.log_json, {'stage': STAGE, 'output': out_path})
+    33	    return 0
+    34	
+    35	if __name__ == '__main__':
+    36	    sys.exit(main())

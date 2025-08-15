@@ -1,0 +1,31 @@
+     1	# Core
+     2	numpy>=1.26
+     3	scipy>=1.11
+     4	librosa>=0.10
+     5	soundfile>=0.12
+     6	PyYAML>=6.0
+     7	jsonschema>=4.21
+     8	rich>=13.0
+     9	 tqdm>=4.66
+    10	
+    11	# DSP & IO
+    12	ffmpeg-python>=0.2
+    13	pydub>=0.25
+    14	pyloudnorm>=0.1.1
+    15	
+    16	# Separation
+    17	torch>=2.1
+    18	 torchaudio>=2.1
+    19	 demucs>=4.0.0
+    20	
+    21	# Dereverb / Denoise
+    22	nara-wpe>=0.0.7
+    23	 deepfilternet>=0.5.6
+    24	
+    25	# RVC
+    26	fairseq>=0.12.2
+    27	 faiss-cpu>=1.7.4
+    28	 huggingface_hub>=0.23
+    29	 onnxruntime>=1.16
+    30	 numba>=0.58
+    31	 llvmlite>=0.41
