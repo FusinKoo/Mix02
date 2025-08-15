@@ -1,0 +1,7 @@
+songs: [MySong]
+preset: best-quality
+rvc:
+  enable: true
+  model_path: models/rvc/DUMMY.pth
+resources:
+  threads: 8

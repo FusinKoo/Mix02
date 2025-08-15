@@ -1,0 +1,131 @@
+workdir: ".."
+
+configfile: "config/config.yaml"
+
+songs = config["songs"]
+preset = config.get("preset", "best-quality")
+threads_default = config.get("resources", {}).get("threads", 1)
+
+rule all:
+    input:
+        expand("output/{song}/99_Final_{song}_mix_24b48k.wav", song=songs),
+        expand("output/{song}/QC.md", song=songs),
+        expand("output/{song}/RUNLOG.json", song=songs)
+
+rule env_probe:
+    output: "work/{song}/stage-00/env.json"
+    params: outdir="work/{song}/stage-00"
+    shell:
+        "python -m bin.env_probe --outdir {params.outdir}"
+
+rule prep_audio:
+    input: "input/{song}.wav"
+    output: "work/{song}/stage-05/master_48k32f.wav"
+    params:
+        outdir="work/{song}/stage-05",
+        preset=preset
+    shell:
+        "python -m bin.prep_audio --in {input} --outdir {params.outdir} --preset {params.preset}"
+
+rule separate_stems:
+    input: "work/{song}/stage-05/master_48k32f.wav"
+    output:
+        vocal="work/{song}/stage-10/Vocal.raw",
+        drums="work/{song}/stage-10/Drums.raw",
+        bass="work/{song}/stage-10/Bass.raw",
+        other="work/{song}/stage-10/Other.raw"
+    params:
+        outdir="work/{song}/stage-10"
+    threads: threads_default
+    shell:
+        "python -m bin.separate_stems --in {input} --outdir {params.outdir}"
+
+rule extract_lead:
+    input: "work/{song}/stage-10/Vocal.raw"
+    output: "work/{song}/stage-21/Lead.raw"
+    params: outdir="work/{song}/stage-21"
+    shell:
+        "python -m bin.extract_lead --in {input} --outdir {params.outdir}"
+
+rule dereverb_denoise:
+    input: "work/{song}/stage-21/Lead.raw"
+    output: "work/{song}/stage-25/Lead_DRY.raw"
+    params: outdir="work/{song}/stage-25"
+    shell:
+        "python -m bin.dereverb_denoise --in {input} --outdir {params.outdir}"
+
+# Optional build_rvc_index
+if config.get("rvc", {}).get("build_index", False):
+    rule build_rvc_index:
+        input: "work/{song}/stage-05/master_48k32f.wav"
+        output: "models/rvc/{song}.index"
+        params: outdir="models/rvc"
+        shell:
+            "python -m bin.build_rvc_index --in {input} --outdir {params.outdir}"
+
+rule rvc_convert:
+    input: "work/{song}/stage-25/Lead_DRY.raw"
+    output: "work/{song}/stage-35/Lead_RVC.raw"
+    params:
+        outdir="work/{song}/stage-35",
+        model=config.get("rvc", {}).get("model_path", "")
+    shell:
+        "python -m bin.rvc_convert --in {input} --outdir {params.outdir} --model {params.model}"
+
+rule track_chain_drums:
+    input: "work/{song}/stage-10/Drums.raw"
+    output: "work/{song}/stage-40/01_Drums_stem.wav"
+    params: outdir="work/{song}/stage-40"
+    shell:
+        "python -m bin.track_chain --in {input} --outdir {params.outdir}"
+
+rule track_chain_bass:
+    input: "work/{song}/stage-10/Bass.raw"
+    output: "work/{song}/stage-41/02_Bass_stem.wav"
+    params: outdir="work/{song}/stage-41"
+    shell:
+        "python -m bin.track_chain --in {input} --outdir {params.outdir}"
+
+rule track_chain_other:
+    input: "work/{song}/stage-10/Other.raw"
+    output: "work/{song}/stage-42/03_Other_stem.wav"
+    params: outdir="work/{song}/stage-42"
+    shell:
+        "python -m bin.track_chain --in {input} --outdir {params.outdir}"
+
+rule track_chain_lead:
+    input: "work/{song}/stage-35/Lead_RVC.raw"
+    output: "work/{song}/stage-43/04_Lead_RVC_processed.wav"
+    params: outdir="work/{song}/stage-43"
+    shell:
+        "python -m bin.track_chain --in {input} --outdir {params.outdir}"
+
+rule mix_bus:
+    input:
+        drums="work/{song}/stage-40/01_Drums_stem.wav",
+        bass="work/{song}/stage-41/02_Bass_stem.wav",
+        other="work/{song}/stage-42/03_Other_stem.wav",
+        lead="work/{song}/stage-43/04_Lead_RVC_processed.wav"
+    output: "output/{song}/99_Final_{song}_mix_24b48k.wav"
+    params: outdir="output/{song}"
+    shell:
+        "python -m bin.mix_bus --drums {input.drums} --bass {input.bass} --other {input.other} --lead {input.lead} --outdir {params.outdir}"
+
+rule qc_report:
+    input: "output/{song}/99_Final_{song}_mix_24b48k.wav"
+    output:
+        json="output/{song}/qc.json",
+        md="output/{song}/QC.md"
+    params: outdir="output/{song}"
+    shell:
+        "python -m bin.qc_report --in {input} --outdir {params.outdir}"
+
+rule finalize_run:
+    input:
+        mix="output/{song}/99_Final_{song}_mix_24b48k.wav",
+        qc="output/{song}/QC.md"
+    output: "output/{song}/RUNLOG.json"
+    params: outdir="output/{song}"
+    shell:
+        "python -m bin.finalize_run --song {wildcards.song} --outdir {params.outdir}"
+

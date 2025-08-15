@@ -1,22 +1,39 @@
-{
-  "demucs": {
-    "provider": "pip-demucs",
-    "models": ["htdemucs_ft"]
+[
+  {
+    "name": "hubert-base",
+    "version": "1.0",
+    "urls": [
+      "https://huggingface.co/facebook/hubert-base/resolve/main/hubert.pt"
+    ],
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "size": 0
   },
-  "hubert": {
-    "files": [
-      {"path": "models/hubert/hubert_base.pt", "source": "hf:facebook/hubert-base:resolve/main/hubert.pt", "sha256": null}
-    ]
+  {
+    "name": "rmvpe",
+    "version": "1.0",
+    "urls": [
+      "https://huggingface.co/lj1995/VoiceConversionWebUI/resolve/main/assets/rmvpe.pt"
+    ],
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "size": 0
   },
-  "f0": {
-    "files": [
-      {"path": "models/f0/rmvpe.pt", "source": "hf:lj1995/VoiceConversionWebUI:resolve/main/assets/rmvpe.pt", "sha256": null},
-      {"path": "models/f0/fcpe.pt",  "source": "hf:FishAudio/FCPE:resolve/main/fcpe.pt", "sha256": null}
-    ]
+  {
+    "name": "fcpe",
+    "version": "1.0",
+    "urls": [
+      "https://huggingface.co/FishAudio/FCPE/resolve/main/fcpe.pt"
+    ],
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "size": 0
   },
-  "dfn": {
-    "files": [
-      {"path": "models/dfn/DeepFilterNet3/model", "source": "hf:Rikorose/DeepFilterNet:resolve/main/DeepFilterNet3/model", "sha256": null}
-    ]
+  {
+    "name": "deepfilternet3",
+    "version": "3.x",
+    "urls": [
+      "https://huggingface.co/Rikorose/DeepFilterNet/resolve/main/DeepFilterNet3/model"
+    ],
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "size": 0
   }
-}
+]
+

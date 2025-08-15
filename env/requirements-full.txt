@@ -6,7 +6,7 @@ soundfile>=0.12
 PyYAML>=6.0
 jsonschema>=4.21
 rich>=13.0
- tqdm>=4.66
+tqdm>=4.66
 
 # DSP & IO
 ffmpeg-python>=0.2
@@ -28,4 +28,5 @@ fairseq>=0.12.2
  huggingface_hub>=0.23
  onnxruntime>=1.16
  numba>=0.58
- llvmlite>=0.41
+llvmlite>=0.41
+snakemake>=7.32
