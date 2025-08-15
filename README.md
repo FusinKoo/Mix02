@@ -19,6 +19,15 @@ chmod +x scripts/run_pipeline.sh
 python scripts/run_pipeline.py MySong
 ```
 
+### Snakemake 编排
+项目同时提供 Snakemake 工作流，便于并行与复现：
+
+```bash
+cd workflow
+snakemake --profile profiles/local --dry-run   # 预览 DAG
+```
+详见 `workflow/README-snakemake.md`。
+
 ## 项目结构
 | 目录 | 说明 |
 | --- | --- |
