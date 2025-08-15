@@ -1,0 +1,37 @@
+     1	from __future__ import annotations
+     2	import argparse, json, os, sys
+     3	from . import _utils as u
+     4	
+     5	STAGE = '40-track_chain'
+     6	NAME_MAP = {
+     7	    'Drums': '01_Drums_stem.wav',
+     8	    'Bass': '02_Bass_stem.wav',
+     9	    'Other': '03_Other_stem.wav',
+    10	    'Lead_RVC': '04_Lead_RVC_processed.wav'
+    11	}
+    12	
+    13	def main():
+    14	    ap = argparse.ArgumentParser()
+    15	    u.add_common_args(ap)
+    16	    ap.add_argument('--target-lufs', type=float, default=-18)
+    17	    ap.add_argument('--tp', type=float, default=-1.0)
+    18	    args = ap.parse_args()
+    19	    u.load_preset(args.preset)
+    20	    ov = u.parse_overrides(args.override)
+    21	    base = os.path.splitext(os.path.basename(args.inp or 'track'))[0]
+    22	    guess = NAME_MAP.get(base, base + '_processed.wav')
+    23	    out_path = args.out or os.path.join(args.outdir, guess)
+    24	    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    25	    plan = {'stage': STAGE, 'plan_output': os.path.abspath(out_path)}
+    26	    if args.dry_run:
+    27	        print(json.dumps(plan, ensure_ascii=False, indent=2))
+    28	        return 0
+    29	    open(out_path, 'w', encoding='utf-8').write('track\n')
+    30	    sc = u.sidecar(out_path, STAGE, args.preset, ov, args.inp)
+    31	    with open(out_path + '.json', 'w', encoding='utf-8') as f:
+    32	        json.dump(sc, f, ensure_ascii=False, indent=2)
+    33	    u.emit_log(args.log_json, {'stage': STAGE, 'output': out_path})
+    34	    return 0
+    35	
+    36	if __name__ == '__main__':
+    37	    sys.exit(main())

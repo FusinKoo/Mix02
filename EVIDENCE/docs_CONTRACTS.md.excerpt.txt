@@ -1,0 +1,26 @@
+     1	# Mix02 契约说明
+     2	
+     3	| Stage | CLI | Input | Output | Spec | Notes |
+     4	| ----- | --- | ----- | ------ | ---- | ----- |
+     5	| 00 | env_probe | N/A | env.txt | - | 确认运行环境 |
+     6	| 05 | prep_audio | `input/<song>.wav` | `work/<song>/stage-05/master_48k32f.wav` | 48k/32f/stereo | 校验输入存在 |
+     7	| 10 | separate_stems | `stage-05/master_48k32f.wav` | `stage-10/{Vocal,Drums,Bass,Other}.raw` | 48k/32f/stereo | 分轨占位 |
+     8	| 21 | extract_lead | `stage-10/Vocal.raw` | `stage-21/Lead.raw` | 48k/32f/stereo | 提取主人声 |
+     9	| 25 | dereverb_denoise | `stage-21/Lead.raw` | `stage-25/Lead_DRY.raw` | 48k/32f/stereo | 去混响+降噪 |
+    10	| 30 | build_rvc_index | `assets/guide.wav` | `models/rvc/G_8200.index` | 48k/32f/stereo | 可重复运行 |
+    11	| 35 | rvc_convert | `stage-25/Lead_DRY.raw` | `stage-35/Lead_RVC.raw` | 48k/32f/stereo | RVC 转换 |
+    12	| 40-43 | track_chain | `<stem>.raw` | `<stage>/0x_<Name>_stem.wav` | 48k/32f/stereo | 各轨处理 |
+    13	| 50 | mix_bus | 各轨 stem | `output/<Song>/99_Final_<Song>_mix_24b48k.wav` | 48k/24b/stereo | 总线混音 |
+    14	| 60 | qc_report | 输出目录 | `QC.md` + `qc.json` | - | 生成质检报告 |
+    15	| 99 | finalize_run | 输出目录 | `RUNLOG.json` | - | 归档运行 |
+    16	
+    17	## 退出码
+    18	
+    19	- `0` 成功
+    20	- `1` 未知异常
+    21	- `12` 输入不合规
+    22	- `22` 模型缺失
+    23	- `32` 资源不足
+    24	- `42` 响度不达标（占位实现永不触发）
+    25	
+    26	内部音频统一规格：**48 kHz / 32-bit float / Stereo**。

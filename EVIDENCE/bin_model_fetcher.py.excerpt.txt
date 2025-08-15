@@ -1,0 +1,60 @@
+     1	from __future__ import annotations
+     2	import argparse, json, os, sys, shutil, pathlib
+     3	from typing import List, Dict, Any
+     4	from . import _utils as u
+     5	
+     6	STAGE = '00-model_fetcher'
+     7	
+     8	ROOT = pathlib.Path(__file__).resolve().parents[1]
+     9	REGISTRY_DEFAULT = ROOT / 'models' / 'registry.json'
+    10	
+    11	
+    12	def parse_hf_source(src: str):
+    13	    spec = src[3:]
+    14	    if ':' in spec:
+    15	        repo, rest = spec.split(':', 1)
+    16	    else:
+    17	        repo, rest = spec, ''
+    18	    revision = None
+    19	    filename = rest
+    20	    if rest.startswith('resolve/'):
+    21	        _, revision, filename = rest.split('/', 2)
+    22	    return repo, filename, revision
+    23	
+    24	
+    25	def download_hf(src: str, dest: pathlib.Path):
+    26	    from huggingface_hub import hf_hub_download
+    27	    repo, filename, revision = parse_hf_source(src)
+    28	    tmp = hf_hub_download(repo_id=repo, filename=filename, revision=revision)
+    29	    os.makedirs(dest.parent, exist_ok=True)
+    30	    shutil.copyfile(tmp, dest)
+    31	
+    32	
+    33	def fetch_files(items: List[Dict[str, Any]], force: bool, missing: List[Dict[str, str]]):
+    34	    for it in items:
+    35	        dest = ROOT / it['path']
+    36	        if dest.exists() and not force:
+    37	            continue
+    38	        try:
+    39	            src = it['source']
+    40	            if src.startswith('hf:'):
+    41	                download_hf(src, dest)
+    42	            else:
+    43	                raise RuntimeError(f'Unsupported source {src}')
+    44	            if it.get('sha256'):
+    45	                if u.sha256_file(str(dest)) != it['sha256']:
+    46	                    raise RuntimeError('sha256 mismatch')
+    47	        except Exception as e:
+    48	            missing.append({'file': it['path'], 'error': str(e)})
+    49	
+    50	
+    51	def fetch_demucs(models: List[str], missing: List[Dict[str, str]]):
+    52	    try:
+    53	        import demucs.pretrained
+    54	        for m in models:
+    55	            try:
+    56	                demucs.pretrained.get_model(m)
+    57	            except Exception as e:
+    58	                missing.append({'demucs_model': m, 'error': str(e)})
+    59	    except Exception as e:
+    60	        missing.append({'provider': 'demucs', 'error': str(e)})
